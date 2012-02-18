@@ -245,6 +245,7 @@ static const NSString *oauthSignatureMethodName[] = {
 
 - (void)resetOAuthToken
 {
+	[self willChangeValueForKey:@"isAuthenticated"];
     _tokenType = RSOAuthRequestToken;
     _tokenSecret = nil;
     _verifier = nil;
@@ -253,6 +254,7 @@ static const NSString *oauthSignatureMethodName[] = {
     [self setOAuthValue:self.callbackURL forKey:@"oauth_callback"];
     [self setOAuthValue:@"" forKey:@"oauth_verifier"];
     [self setOAuthValue:@"" forKey:@"oauth_token"];
+	[self didChangeValueForKey:@"isAuthenticated"];
 }
 
 - (NSString *)customValueForKey:(NSString *)key
@@ -263,6 +265,8 @@ static const NSString *oauthSignatureMethodName[] = {
 
 - (void)fillTokenWithResponseBody:(NSString *)body type:(RSOAuthTokenType)tokenType
 {
+	[self willChangeValueForKey:@"isAuthenticated"];
+	
     NSArray *pairs = [body componentsSeparatedByString:@"&"];
 
     for (NSString *pair in pairs)
@@ -292,10 +296,12 @@ static const NSString *oauthSignatureMethodName[] = {
         [self setOAuthValue:self.callbackURL forKey:@"oauth_callback"];
         [self setOAuthValue:self.verifier forKey:@"oauth_verifier"];
     }
+	[self didChangeValueForKey:@"isAuthenticated"];
 }
 
 - (void)setAccessToken:(NSString *)token secret:(NSString *)tokenSecret
 {
+	[self willChangeValueForKey:@"isAuthenticated"];
     NSAssert(token, @"Token cannot be null");
     NSAssert(tokenSecret, @"Token Secret cannot be null");
     
@@ -308,6 +314,7 @@ static const NSString *oauthSignatureMethodName[] = {
     // Since we already have an Access Token, no need to send the Verifier and Callback URL
     [self setOAuthValue:nil forKey:@"oauth_callback"];
     [self setOAuthValue:nil forKey:@"oauth_verifier"];
+	[self didChangeValueForKey:@"isAuthenticated"];
 }
 
 - (void)signRequest:(MKNetworkOperation *)request
